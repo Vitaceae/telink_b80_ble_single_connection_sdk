@@ -78,7 +78,11 @@ static u16 serviceChangeVal[2] = {0};
 
 static u8 serviceChangeCCC[2] = {0,0};
 
+#if defined(ZEROPLUS_DEMO) && (ZEROPLUS_DEMO == 1)
+static const u8 my_devName[] = {'z', 'P', 'l', 'u', 's'};
+#else
 static const u8 my_devName[] = {'e','S','a','m','p','l','e'};
+#endif
 
 static const u8 my_PnPtrs [] = {0x02, 0x8a, 0x24, 0x66, 0x82, 0x01, 0x00};
 
@@ -216,6 +220,11 @@ static u8 my_OtaData 						        = 0x00;
 static const u8  my_OtaName[] = {'O', 'T', 'A'};
 #endif
 
+#if defined(ZEROPLUS_DEMO) && (ZEROPLUS_DEMO == 1)
+static const u8 my_ZeroplusServiceUUID[16]			= WRAPPING_BRACES(SERVICE_UUID_ZEROPLUS);
+static const u8 my_ZeroplusCharUUID[16]				= WRAPPING_BRACES(CHARACTERISTIC_UUID_ZEROPLUS);
+static const u8 my_ZeroplusDataUUID[16]					= WRAPPING_BRACES(ZEROPLUS_DATA);
+#endif
 
 // Include attribute (Battery service)
 static const u16 include[3] = {BATT_PS_H, BATT_LEVEL_INPUT_CCB_H, SERVICE_UUID_BATTERY};
@@ -324,6 +333,13 @@ static const u8 my_OtaCharVal[19] = {
 };
 #endif
 
+#if defined(ZEROPLUS_DEMO) && (ZEROPLUS_DEMO == 1)
+static const u8 my_ZeroplusCharVal[19] = {
+	CHAR_PROP_READ | CHAR_PROP_NOTIFY,
+	U16_LO(ZEROPLUS_INPUT_DP_H), U16_HI(ZEROPLUS_INPUT_DP_H),
+	ZEROPLUS_DATA,
+};
+#endif
 
 // TM : to modify
 static const attribute_t my_Attributes[] = {
@@ -422,6 +438,12 @@ static const attribute_t my_Attributes[] = {
 	{0,ATT_PERMISSIONS_RDWR,16,sizeof(my_OtaData),(u8*)(&my_OtaUUID),	(&my_OtaData), &otaWrite, NULL},			//value
 	{0,ATT_PERMISSIONS_READ, 2,sizeof (my_OtaName),(u8*)(&userdesc_UUID), (u8*)(my_OtaName), 0},
 	#endif
+
+#if defined(ZEROPLUS_DEMO) && (ZEROPLUS_DEMO == 1)
+	{3,ATT_PERMISSIONS_READ,2,16,(u8*)(&my_primaryServiceUUID), (u8*)my_ZeroplusServiceUUID, 0},
+	{0,ATT_PERMISSIONS_READ,2,sizeof(my_ZeroplusCharVal),(u8*)(&my_characterUUID), (u8*)my_ZeroplusCharVal, 0},
+	{0,ATT_PERMISSIONS_READ,16,sizeof(my_zeroplusData),(u8 *)my_ZeroplusDataUUID, (u8 *)(my_zeroplusData), 0},
+#endif
 };
 
 

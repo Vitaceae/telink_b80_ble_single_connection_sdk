@@ -30,7 +30,6 @@
 #include "app_att.h"
 #include "app_ui.h"
 
-
 #if (UI_KEYBOARD_ENABLE)
 
 int 	key_not_released;
@@ -201,4 +200,44 @@ void app_ota_result(int result)
 }
 
 
+#endif
+
+#if defined(ZEROPLUS_DEMO) && (ZEROPLUS_DEMO == 1)
+#include "app_buffer.h"
+#define DBG_TEST	1
+
+u8 my_zeroplusData[1] = {0x01};
+
+void proc_notify_demo(void)
+{
+	static u8 loop_count = 0;
+
+	loop_count++;
+	if (loop_count < 50) {
+		return;
+	} else {
+		loop_count = 0;
+	}
+
+#if DBG_TEST
+	printf("zeroplus-test\n");
+#endif
+
+	u8 tx_fifo_count = blc_ll_getTxFifoNumber();
+	if (tx_fifo_count >= (ACL_TX_FIFO_NUM - 2)) {
+#if DBG_TEST
+		printf("tx_fifo_count=%d\n", tx_fifo_count);
+#endif
+		return;
+	}
+
+	//FIFO not full
+	my_zeroplusData[0]++;
+	u8 status = (u8)blc_gatt_pushHandleValueNotify(BLS_CONN_HANDLE, ZEROPLUS_INPUT_DP_H, (u8 *)&my_zeroplusData[0], 1);
+	if (status != BLE_SUCCESS) {
+#if DBG_TEST
+		printf("err: status=0x%x\n", status);
+#endif
+	}
+}
 #endif

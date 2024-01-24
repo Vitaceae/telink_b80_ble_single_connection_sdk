@@ -43,6 +43,10 @@
 #define PM_DEEPSLEEP_ENABLE            				0 		//test connection power, should disable deepSleep
 #define PM_DEEPSLEEP_RETENTION_ENABLE               1
 
+#define ZEROPLUS_DEMO								1
+#if defined(ZEROPLUS_DEMO) && (ZEROPLUS_DEMO == 1)
+extern unsigned char my_zeroplusData[1];
+#endif
 
 /**
  *  @brief  UI Configuration

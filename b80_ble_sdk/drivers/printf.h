@@ -25,18 +25,18 @@
 #include "gpio.h"
 #pragma once
 
-#define DEBUG_MODE 0
+#define DEBUG_MODE 1
 
 #if(DEBUG_MODE==1)
 
 #define  DEBUG_IO		1
 #define  DEBUG_USB		2
 
-#define  DEBUG_BUS  	0
+#define  DEBUG_BUS  	1
 
 #if(DEBUG_BUS==DEBUG_IO)
 #define PRINT_BAUD_RATE             		115200   	//1M baud rate,should Not bigger than 1Mb/s
-#define DEBUG_INFO_TX_PIN           		GPIO_PD3
+#define DEBUG_INFO_TX_PIN           		GPIO_PA3
 #define TX_PIN_GPIO_EN()					gpio_set_func(DEBUG_INFO_TX_PIN , AS_GPIO);
 #define TX_PIN_PULLUP_1M()					gpio_setup_up_down_resistor(DEBUG_INFO_TX_PIN, PM_PIN_PULLUP_1M);
 #define TX_PIN_OUTPUT_EN()					gpio_set_output_en(DEBUG_INFO_TX_PIN,1)

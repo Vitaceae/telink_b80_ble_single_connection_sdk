@@ -63,7 +63,11 @@ own_addr_type_t app_own_address_type = OWN_ADDRESS_PUBLIC;
  * @brief	BLE Advertising data
  */
 const u8	tbl_advData[] = {
+#if defined(ZEROPLUS_DEMO) && (ZEROPLUS_DEMO == 1)
+	 8,  DT_COMPLETE_LOCAL_NAME, 				'z', 'P', 'l', 'u', 's', ' ', ' ',
+#else
 	 8,  DT_COMPLETE_LOCAL_NAME, 				'e', 'S', 'a', 'm', 'p', 'l', 'e',
+#endif
 	 2,	 DT_FLAGS, 								0x05, 					// BLE limited discoverable mode and BR/EDR not supported
 	 3,  DT_APPEARANCE, 						0x80, 0x01, 			// 384, Generic Remote Control, Generic category
 	 5,  DT_INCOMPLT_LIST_16BIT_SERVICE_UUID,	0x12, 0x18, 0x0F, 0x18,	// incomplete list of service class UUIDs (0x1812, 0x180F)
@@ -73,7 +77,11 @@ const u8	tbl_advData[] = {
  * @brief	BLE Scan Response Packet data
  */
 const u8	tbl_scanRsp [] = {
+#if defined(ZEROPLUS_DEMO) && (ZEROPLUS_DEMO == 1)
+	 8,  DT_COMPLETE_LOCAL_NAME, 				'z', 'P', 'l', 'u', 's', ' ', ' ',
+#else
 	 8,  DT_COMPLETE_LOCAL_NAME, 				'e', 'S', 'a', 'm', 'p', 'l', 'e',
+#endif
 };
 
 
@@ -553,9 +561,16 @@ void main_loop (void)
 		proc_keyboard (0, 0, 0);
 	#endif
 
+#if defined(ZEROPLUS_DEMO) && (ZEROPLUS_DEMO == 1)
+		proc_notify_demo();
+#endif
 
 	////////////////////////////////////// PM Process /////////////////////////////////
+#if defined(ZEROPLUS_DEMO) && (ZEROPLUS_DEMO == 1)
+	//disable sleep mode for demo purpose
+#else
 	blt_pm_proc();
+#endif
 
 }
 

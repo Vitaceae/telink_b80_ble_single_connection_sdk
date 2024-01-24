@@ -128,7 +128,12 @@ typedef enum
 	OTA_CMD_OUT_DESC_H,						//UUID: 2901, 	VALUE: otaName
 	#endif
 
-
+#if 1 //defined(ZEROPLUS_DEMO) && (ZEROPLUS_DEMO == 1)
+	ZEROPLUS_PS_H,
+	ZEROPLUS_INPUT_CD_H,
+	ZEROPLUS_INPUT_DP_H,
+	OTA_CMD_OUT_DESC_H,
+#endif
 
 	ATT_END_H,
 

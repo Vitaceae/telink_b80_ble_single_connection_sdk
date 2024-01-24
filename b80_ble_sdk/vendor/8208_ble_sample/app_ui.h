@@ -79,5 +79,8 @@ void app_enter_ota_mode(void);
  */
 void app_ota_result(int result);
 
+#if 1//defined(ZEROPLUS_DEMO) && (ZEROPLUS_DEMO == 1)
+void proc_notify_demo(void);
+#endif
 
 #endif /* APP_UI_H_ */
