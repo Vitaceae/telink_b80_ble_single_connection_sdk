@@ -173,6 +173,7 @@ void hook_spp_c2s_data(u8 len, u8 *data)
 	}
 
 	SppDataClient2ServerData[0] = data[0];
+	SppDataServer2ClientData[0] = data[0];
 
 	printf("c2s: ");
 	for (u8 i = 0; i < len; i++) {
