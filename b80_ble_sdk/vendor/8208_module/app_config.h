@@ -23,6 +23,7 @@
 
 #pragma once
 
+#define ZEROPLUS_DEMO						1
 
 ///////////////////////// Feature Configuration////////////////////////////////////////////////
 /**
@@ -36,7 +37,7 @@
 #define FIRMWARES_SIGNATURE_ENABLE     		 		0
 
 /* Power Management */
-#define BLE_MODULE_PM_ENABLE							1
+#define BLE_MODULE_PM_ENABLE							0
 #define PM_DEEPSLEEP_RETENTION_ENABLE         0
 
 

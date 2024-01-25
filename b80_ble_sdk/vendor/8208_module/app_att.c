@@ -164,6 +164,24 @@ static const u8 my_OtaCharVal[19] = {
 	TELINK_SPP_DATA_OTA
 };
 
+#include "app_config.h"
+#if defined(ZEROPLUS_DEMO) && (ZEROPLUS_DEMO == 1)
+void hook_spp_c2s_data(u8 len, u8 *data)
+{
+	if (!len || !data) {
+		return;
+	}
+
+	SppDataClient2ServerData[0] = data[0];
+
+	printf("c2s: ");
+	for (u8 i = 0; i < len; i++) {
+		printf("0x%2x ", data[i]);
+	}
+	printf("\n");
+}
+#endif
+
 /**
  * @brief      write callback of Attribute of TelinkSppDataClient2ServerUUID
  * @param[in]  para - rf_packet_att_write_t
@@ -183,6 +201,10 @@ int module_onReceiveData(void *para)
 
 		spp_send_data(HCI_FLAG_EVENT_TLK_MODULE, pEvt);
 	}
+
+#if defined(ZEROPLUS_DEMO) && (ZEROPLUS_DEMO == 1)
+	hook_spp_c2s_data(len, p->dat);
+#endif
 
 	return 0;
 }
