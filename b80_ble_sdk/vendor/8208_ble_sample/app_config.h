@@ -30,7 +30,7 @@
  */
 #define FLASH_SIZE_OPTION							FLASH_SIZE_OPTION_512K //very important, user need confirm !!!
 #define APP_SECURITY_ENABLE      					1
-#define	BLE_OTA_SERVER_ENABLE						0
+#define	BLE_OTA_SERVER_ENABLE						1
 #define TEST_CONN_CURRENT_ENABLE					0		//test connection current, disable UI to have a pure power
 #define SAVE_RAM_CODE_ENABLE						0			//Enable it if need save RAM code.
 																				//Note: When this is enabled, the average power consumption increases.If user use deepsleep retention, user need to add DeepsleepRetentionEarlyWakeupTiming.
