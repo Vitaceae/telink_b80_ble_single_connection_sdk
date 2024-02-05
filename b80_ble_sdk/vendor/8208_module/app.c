@@ -258,6 +258,13 @@ void app_power_management ()
 #endif
 }
 
+static void app_enter_ota_mode(void) {
+	//TODO
+}
+
+static void app_ota_result(int result){
+	//TODO
+}
 
 /**
  * @brief		user initialization when MCU power on or wake_up from deepSleep mode
@@ -446,6 +453,13 @@ void user_init_normal(void)
 
 #endif	
 
+#if 1//(BLE_OTA_SERVER_ENABLE)
+	/* OTA module initialization must be called after "blc_ota_setNewFirmwwareStorageAddress"(if used), and before any other OTA API.*/
+	blc_ota_initOtaServer_module();
+	blc_ota_setOtaProcessTimeout(60); //set OTA whole process timeout
+	blc_ota_registerOtaStartCmdCb(app_enter_ota_mode);
+	blc_ota_registerOtaResultIndicationCb(app_ota_result);
+#endif
 
 #if (BLE_MODULE_PM_ENABLE)
 	blc_ll_initPowerManagement_module();        //pm module:      	 optional
