@@ -1,0 +1,2 @@
+Telink BLE SDK_VERSION = 
+telink_b80_ble_single_connection_sdk_v3.4.1.1
