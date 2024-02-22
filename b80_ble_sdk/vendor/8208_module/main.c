@@ -70,53 +70,64 @@ _attribute_ram_code_sec_noinline_
 #endif
 
 #if ZEROPLUS_CUST == 1
-u8 DisplaBuff1[10] = {0x00,0x60,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-u8 DisplaBuff2[10] = {0xfc,0x60,0xdA,0xF2,0x66,0xB6,0xBE,0xE0,0xFE,0xF6};
-u8 DisplaBuff3[3]= {};
-u16 sample_result = 1000;
-u16 sample_result_Min = 0;
-u16 sample_result_Max = 0;
-u16 Battery_Temp = 0;
-int average_ADC = 0;
-int average_ADC1 = 1000;
-int average_ADC2 = 0;
-int average_ADC3 = 0;
-s16 temp =0;
-u8 counter = 0;
-u32 counter1 = 0;
-u8 percentage =0;
+#define PIN_MY_ADC				B7P
+#define MY_ADC_SAMPLE_NUM		8
+volatile unsigned int adc_buf[MY_ADC_SAMPLE_NUM];
 
-void ReadBattery(void)
+u32 my_adc_read(void)
 {
-	sample_result_Min = 1000;
-	sample_result_Max = 2200;
+	adc_reset_adc_module();
+	u32 t0 = clock_time();
+	u16 adc_sample[MY_ADC_SAMPLE_NUM] = {0};
+	u32 adc_avg = 0;
+	int i, j;
 
-	if (counter1 > 500) {
-		counter1 = 0;
-		adc_set_ain_chn_misc(PIN_BATTERY >> 12, GND);
-		sample_result = adc_sample_and_get_result();
+	for (i = 0; i < MY_ADC_SAMPLE_NUM; i++) {
+		adc_buf[i] = 0;
 	}
-	counter1++;
+	while(!clock_time_exceed(t0, 25));
 
-	if (average_ADC == 0 && counter1 > 500) {
-		average_ADC1 = sample_result;
-		average_ADC = 1;
+	adc_config_misc_channel_buf((u16 *)adc_buf, MY_ADC_SAMPLE_NUM << 2);
+	dfifo_enable_dfifo2();
+	for (i = 0; i < MY_ADC_SAMPLE_NUM; i++) {
+		while (!adc_buf[i]) ;
+
+		//14 bit resolution, BIT(13) is sign bit, 1 means negative voltage in differential_mode
+		if (adc_buf[i] & BIT(13)) {
+			adc_sample[i] = 0;
+		} else {
+			//BIT(12..0) is valid adc result
+			adc_sample[i] = ((u16)adc_buf[i] & 0x1FFF);
+		}
+
+		//insert sort
+		if (i) {
+			if (adc_sample[i] < adc_sample[i - 1]) {
+				u16 temp = adc_sample[i];
+				adc_sample[i] = adc_sample[i - 1];
+				for (j = i - 1; j >= 0 && adc_sample[j] > temp; j--) {
+					adc_sample[j + 1] = adc_sample[j];
+				}
+				adc_sample[j + 1] = temp;
+			}
+		}
 	}
-	average_ADC2 = (sample_result - average_ADC1);
+	dfifo_disable_dfifo2();
 
-	if (average_ADC2 > 10 || average_ADC2 < -10) {
-		average_ADC = 0;
-	}
+	#if (MY_ADC_SAMPLE_NUM == 4)
+		adc_avg = (adc_sample[1] + adc_sample[2]) / 2;
+	#elif(MY_ADC_SAMPLE_NUM == 8)
+		adc_avg = (adc_sample[2] + adc_sample[3] + adc_sample[4] + adc_sample[5]) / 4;
+	#endif
 
-	Battery_Temp = (average_ADC1 - sample_result_Min) * 100 / (sample_result_Max - sample_result_Min);
+	return adc_avg;
 }
 
-void Vbat_ADCInit(void)
+void my_adc_init(void)
 {
-	 adc_init();
-	 adc_base_init(PIN_BATTERY);
-	 adc_vbat_channel_init();
-	 adc_power_on_sar_adc(1);
+	adc_init();
+	adc_set_ain_chn_misc(PIN_MY_ADC, GND);
+	adc_power_on_sar_adc(1);
 }
 #endif
 
@@ -160,13 +171,26 @@ int main(void)
     irq_enable();
 
 #if ZEROPLUS_CUST == 1
-    Vbat_ADCInit();
+    my_adc_init();
+	u32 adc_val_old = 0, adc_val;
+	int loop_count = 0;
+
+	printf("sys init\n");
 #endif
 
 	while (1) {
 #if ZEROPLUS_CUST == 1
-		ReadBattery();
-		printf("%1x\t%d\r\n", Battery_Temp, sample_result);
+		loop_count++;
+		if (loop_count >= 10000) {
+			loop_count = 0;
+			adc_val = my_adc_read();
+			if (adc_val != adc_val_old) {
+				adc_val_old = adc_val;
+				printf("adc: %d\n", adc_val);
+			} else {
+				printf("no change\n");
+			}
+		}
 #endif
 		main_loop ();
 	}

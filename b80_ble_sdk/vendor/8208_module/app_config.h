@@ -26,7 +26,6 @@
 #define ZEROPLUS_DEMO						0
 #define ZEROPLUS_CUST						1
 #if ZEROPLUS_CUST == 1
-#define PIN_BATTERY							ADC_GPIO_PB7
 #endif
 
 ///////////////////////// Feature Configuration////////////////////////////////////////////////
@@ -53,7 +52,7 @@
 #define UI_LED_ENABLE					1
 #define TELINK_SPP_SERVICE_ENABLE			1
 #define BLE_MODULE_INDICATE_DATA_TO_MCU		1
-#define BATT_CHECK_ENABLE       			1   //enable or disable battery voltage detection
+#define BATT_CHECK_ENABLE       			0   //enable or disable battery voltage detection
 
 
 
