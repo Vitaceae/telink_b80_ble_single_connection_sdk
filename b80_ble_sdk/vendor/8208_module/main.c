@@ -68,6 +68,58 @@ _attribute_ram_code_ void irq_handler(void)
 #if (PM_DEEPSLEEP_RETENTION_ENABLE)
 _attribute_ram_code_sec_noinline_
 #endif
+
+#if ZEROPLUS_CUST == 1
+u8 DisplaBuff1[10] = {0x00,0x60,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+u8 DisplaBuff2[10] = {0xfc,0x60,0xdA,0xF2,0x66,0xB6,0xBE,0xE0,0xFE,0xF6};
+u8 DisplaBuff3[3]= {};
+u16 sample_result = 1000;
+u16 sample_result_Min = 0;
+u16 sample_result_Max = 0;
+u16 Battery_Temp = 0;
+int average_ADC = 0;
+int average_ADC1 = 1000;
+int average_ADC2 = 0;
+int average_ADC3 = 0;
+s16 temp =0;
+u8 counter = 0;
+u32 counter1 = 0;
+u8 percentage =0;
+
+void ReadBattery(void)
+{
+	sample_result_Min = 1000;
+	sample_result_Max = 2200;
+
+	if (counter1 > 500) {
+		counter1 = 0;
+		adc_set_ain_chn_misc(PIN_BATTERY >> 12, GND);
+		sample_result = adc_sample_and_get_result();
+	}
+	counter1++;
+
+	if (average_ADC == 0 && counter1 > 500) {
+		average_ADC1 = sample_result;
+		average_ADC = 1;
+	}
+	average_ADC2 = (sample_result - average_ADC1);
+
+	if (average_ADC2 > 10 || average_ADC2 < -10) {
+		average_ADC = 0;
+	}
+
+	Battery_Temp = (average_ADC1 - sample_result_Min) * 100 / (sample_result_Max - sample_result_Min);
+}
+
+void Vbat_ADCInit(void)
+{
+	 adc_init();
+	 adc_base_init(PIN_BATTERY);
+	 adc_vbat_channel_init();
+	 adc_power_on_sar_adc(1);
+}
+#endif
+
 int main(void)
 {
 	#if (BLE_MODULE_PM_ENABLE)
@@ -107,8 +159,15 @@ int main(void)
 
     irq_enable();
 
-	while (1) {
+#if ZEROPLUS_CUST == 1
+    Vbat_ADCInit();
+#endif
 
+	while (1) {
+#if ZEROPLUS_CUST == 1
+		ReadBattery();
+		printf("%1x\t%d\r\n", Battery_Temp, sample_result);
+#endif
 		main_loop ();
 	}
 }

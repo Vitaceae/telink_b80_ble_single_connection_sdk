@@ -23,7 +23,11 @@
 
 #pragma once
 
-#define ZEROPLUS_DEMO						1
+#define ZEROPLUS_DEMO						0
+#define ZEROPLUS_CUST						1
+#if ZEROPLUS_CUST == 1
+#define PIN_BATTERY							ADC_GPIO_PB7
+#endif
 
 ///////////////////////// Feature Configuration////////////////////////////////////////////////
 /**
